@@ -10,8 +10,16 @@ module SendgridToolkit
 
     private
     def convert_params(options)
-    	options["x-smtpapi"] = options["x-smtpapi"].to_json if options.has_key?("x-smtpapi")
-    	options
+      if options.has_key?("x-smtpapi") && !x_smtpapi_parsable_json?(options)
+        options["x-smtpapi"] = options["x-smtpapi"].to_json
+      end
+      options
+    end
+
+    def x_smtpapi_parsable_json? options
+      !!JSON.parse(options["x-smtpapi"])
+    rescue
+      false
     end
   end
 end

@@ -20,5 +20,12 @@ describe SendgridToolkit::Mail do
       response = @obj.send_mail :to => "scottb@sendgrid.com", :from => "testing@fiverr.com", :subject => "Subject", :text => "Text", "x-smtpapi" => xsmtpapi
       response.request.options[:query]["x-smtpapi"].should == xsmtpapi.to_json
     end
+
+    it "only converts x-smtpapi to json if it has not been converted yet" do
+      FakeWeb.register_uri(:post, %r|https://#{REGEX_ESCAPED_BASE_URI}/mail\.send\.json\?|, :body => '{"message":"success"}')
+      xsmtpapi = {:category => "Testing", :to => ["scottb@sendgrid.com"]}.to_json
+      response = @obj.send_mail :to => "scottb@sendgrid.com", :from => "testing@fiverr.com", :subject => "Subject", :text => "Text", "x-smtpapi" => xsmtpapi
+      response.request.options[:query]["x-smtpapi"].should == xsmtpapi
+    end
   end
 end
